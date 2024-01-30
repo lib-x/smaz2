@@ -1,5 +1,11 @@
 package smaz2
 
+import "errors"
+
+var (
+	InvalidInput = errors.New("invalid input")
+)
+
 /* 128 common bigrams. */
 const bigrams = "intherreheanonesorteattistenntartondalitseediseangoulecomeneriroderaioicliofasetvetasihamaecomceelllcaurlachhidihofonsotacnarssoprrtsassusnoiltsemctgeloeebetrnipeiepancpooldaadviunamutwimoshyoaiewowosfiepttmiopiaweagsuiddoooirspplscaywaigeirylytuulivimabty"
 
@@ -39,11 +45,11 @@ var words = []string{
 	"love", "main", "another", "class", "still",
 }
 
-// Compress compresses a string.
-func Compress(s string) []byte {
+// CompressBytes compresses a byte slice. it returns the length of compressed bytes.
+func CompressBytes(s []byte) []byte {
 	dst := make([]byte, 0)
 	verbatimLen := 0
-	sb := []byte(s)
+	sb := s
 
 	for len(sb) > 0 {
 		var i int
@@ -111,14 +117,22 @@ func Compress(s string) []byte {
 				verbatimLen = 0
 			}
 		}
-
 		sb = sb[1:]
 	}
 	return dst
 }
 
-// Decompress decompresses a byte slice to string.
-func Decompress(c []byte) string {
+// Compress compresses a string.return the compressed bytes.
+func Compress(s string) []byte {
+	sb := []byte(s)
+	return CompressBytes(sb)
+}
+
+// DecompressToBytes decompresses a byte slice to the original bytes.
+func DecompressToBytes(c []byte) ([]byte, error) {
+	if len(c) == 0 {
+		return nil, InvalidInput
+	}
 	i := 0
 	res := make([]byte, 0)
 	for i < len(c) {
@@ -144,5 +158,14 @@ func Decompress(c []byte) string {
 			i++
 		}
 	}
-	return string(res)
+	return res, nil
+}
+
+// Decompress decompresses a byte slice to the original string.
+func Decompress(c []byte) (string, error) {
+	origin, err := DecompressToBytes(c)
+	if err != nil {
+		return "", err
+	}
+	return string(origin), nil
 }

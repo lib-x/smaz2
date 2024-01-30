@@ -16,6 +16,9 @@ func Test_Decompress(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	decompress := Decompress(b)
+	decompress, err := Decompress(b)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Log(decompress)
 }
